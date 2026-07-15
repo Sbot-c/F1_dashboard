@@ -222,37 +222,42 @@ with tab3:
     
     fig_historical = go.Figure()
     
+    # Trace 1: Corporate Revenue (Electric Cyan Accent)
     fig_historical.add_trace(go.Scatter(
         x=business_df['season'], y=business_df['total_revenue_usd_m'],
         mode='lines+markers', name='Total F1 Corporate Revenue ($M)',
-        line=dict(color='#FF1801', width=3)
+        line=dict(color='#00E5FF', width=3.5),
+        marker=dict(size=8)
     ))
     
+    # Trace 2: Broadcast Revenue (Premium Gold Accent)
     fig_historical.add_trace(go.Scatter(
         x=business_df['season'], y=business_df['broadcast_media_usd_m'],
-        mode='lines', name='TV Broadcast Media Revenue ($M)',
-        line=dict(color='#FFFFFF', dash='dash')
+        mode='lines+markers', name='TV Broadcast Media Revenue ($M)',
+        line=dict(color='#FFD700', width=2.5, dash='dash')
     ))
     
+    # Trace 3: Netflix Drive to Survive (Muted Overlay Bar)
     fig_historical.add_trace(go.Bar(
         x=business_df['season'], y=business_df['drive_to_survive_viewers_m_est'],
         name='Drive to Survive Viewers (Millions)',
-        yaxis='y2', opacity=0.25, marker_color='#FFFFFF'
+        yaxis='y2', opacity=0.15, marker_color='#E0E0E0'
     ))
 
-    # Cleaned, multi-method layout approach to ensure total platform cross-compatibility
+    # Cleaned layout approach with transparent legend card overrides
     fig_historical.update_layout(
         title="F1 Commercial Revenue Acceleration vs Drive To Survive Viewership Over Time",
         template="plotly_dark",
         paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
         font=dict(color="#FFFFFF"),
-        legend=dict(x=0.01, y=0.99, font=dict(color="#FFFFFF")),
+        legend=dict(x=0.01, y=0.99, font=dict(color="#FFFFFF"), bgcolor="rgba(0,0,0,0.5)"),
         barmode='overlay'
     )
     
-    # Update axes explicitly to guarantee font color overrides apply properly
-    fig_historical.update_xaxes(title_text="Season Year", title_font=dict(color="#FFFFFF"), tickfont=dict(color="#FFFFFF"))
-    fig_historical.update_yaxes(title_text="Revenue ($M USD)", title_font=dict(color="#FF1801"), tickfont=dict(color="#FFFFFF"))
+    # Update axes elements with custom color rules and grid configurations explicitly
+    fig_historical.update_xaxes(title_text="Season Year", title_font=dict(color="#FFFFFF"), tickfont=dict(color="#FFFFFF"), showgrid=False)
+    fig_historical.update_yaxes(title_text="Revenue ($M USD)", title_font=dict(color="#00E5FF"), tickfont=dict(color="#FFFFFF"), gridcolor="#222630")
     fig_historical.update_yaxes(title_text="Netflix Viewership (M)", title_font=dict(color="#A0A5B5"), tickfont=dict(color="#FFFFFF"), overlaying='y', side='right', showgrid=False)
     
     st.plotly_chart(fig_historical, use_container_width=True)

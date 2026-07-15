@@ -240,16 +240,19 @@ with tab3:
         yaxis='y2', opacity=0.25, marker_color='#FFFFFF'
     ))
 
-    # Dual-axis layout adjustments to cleanly specify dictionaries for yaxes parameters
+    # Cleaned, multi-method layout approach to ensure total platform cross-compatibility
     fig_historical.update_layout(
         title="F1 Commercial Revenue Acceleration vs Drive To Survive Viewership Over Time",
-        xaxis=dict(title="Season Year", titlefont=dict(color="#FFFFFF"), tickfont=dict(color="#FFFFFF")),
-        yaxis=dict(title="Revenue ($M USD)", color="#FF1801", titlefont=dict(color="#FFFFFF"), tickfont=dict(color="#FFFFFF")),
-        yaxis2=dict(title="Netflix Viewership (M)", color="#A0A5B5", overlaying='y', side='right', showgrid=False, titlefont=dict(color="#FFFFFF"), tickfont=dict(color="#FFFFFF")),
         template="plotly_dark",
         paper_bgcolor="rgba(0,0,0,0)",
         font=dict(color="#FFFFFF"),
         legend=dict(x=0.01, y=0.99, font=dict(color="#FFFFFF")),
         barmode='overlay'
     )
+    
+    # Update axes explicitly to guarantee font color overrides apply properly
+    fig_historical.update_xaxes(title_text="Season Year", title_font=dict(color="#FFFFFF"), tickfont=dict(color="#FFFFFF"))
+    fig_historical.update_yaxes(title_text="Revenue ($M USD)", title_font=dict(color="#FF1801"), tickfont=dict(color="#FFFFFF"))
+    fig_historical.update_yaxes(title_text="Netflix Viewership (M)", title_font=dict(color="#A0A5B5"), tickfont=dict(color="#FFFFFF"), overlaying='y', side='right', showgrid=False)
+    
     st.plotly_chart(fig_historical, use_container_width=True)

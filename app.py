@@ -84,14 +84,7 @@ def load_and_clean_data():
 races_df, constructor_df, driver_df, business_df = load_and_clean_data()
 
 
-# 4. DASHBOARD HEADER & ACCURATE F1 CAR IMAGE
-# Direct web reference link to clear away any local image caching problems completely
-st.image(
-    "https://images.unsplash.com/photo-1560072810-1cffb09faf0f?q=80&w=2070&auto=format&fit=crop", 
-    caption="Formula 1 Strategic Data Analytics Suite", 
-    use_container_width=True
-)
-
+# 4. DASHBOARD HEADER
 st.title("🏎️ FORMULA 1 PERFORMANCE & ECONOMICS CENTRALE")
 st.markdown("An elite analytics environment mapping on-track Grand Prix parameters directly to macroeconomic variables.")
 st.markdown("---")
@@ -128,7 +121,6 @@ with tab1:
                 },
                 title=f"Hierarchical Allocation of Team Budgets & Revenue Profiles ({fin_season})"
             )
-            # Update layouts and force font/legend labels to absolute white text
             fig_tree.update_layout(
                 template="plotly_dark", 
                 paper_bgcolor="rgba(0,0,0,0)",
@@ -154,7 +146,6 @@ with tab1:
                 color_discrete_sequence=['#FF1801', '#FFFFFF'],
                 title=f"{selected_team} Core Income Split ($M)"
             )
-            # Ensuring white text on legends and chart descriptors
             fig_pie.update_layout(
                 template="plotly_dark", 
                 paper_bgcolor="rgba(0,0,0,0)",
@@ -189,7 +180,6 @@ with tab2:
                 color_discrete_sequence=px.colors.sequential.Reds_r,
                 title=f"Proportion of Wins by Driver ({race_season})"
             )
-            # Force legibility across dark panels
             fig_win_pie.update_layout(
                 template="plotly_dark", 
                 paper_bgcolor="rgba(0,0,0,0)",
@@ -250,7 +240,7 @@ with tab3:
         yaxis='y2', opacity=0.25, marker_color='#FFFFFF'
     ))
 
-    # Dual-axis layout configurations with absolute white legend text overrides
+    # Dual-axis layout adjustments to cleanly specify dictionaries for yaxes parameters
     fig_historical.update_layout(
         title="F1 Commercial Revenue Acceleration vs Drive To Survive Viewership Over Time",
         xaxis=dict(title="Season Year", titlefont=dict(color="#FFFFFF"), tickfont=dict(color="#FFFFFF")),

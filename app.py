@@ -79,6 +79,9 @@ def load_and_clean_data():
     cf['cost_cap_limit_usd_m'] = cf['cost_cap_limit_usd_m'].fillna(0)
     races_full = pd.merge(rr, ce, on=['season', 'grand_prix'], how='left', suffixes=('', '_econ'))
     
+    # Map binary 0/1 to descriptive categories for crisp categorical charting
+    races_full['Circuit Type'] = races_full['is_street_circuit'].map({0: 'Permanent Track', 1: 'Street Circuit'})
+    
     return races_full, cf, ds, fb
 
 races_df, constructor_df, driver_df, business_df = load_and_clean_data()
@@ -194,22 +197,32 @@ with tab2:
         st.write("**Circuit Hosting Fee vs Attendance Density**")
         valid_ce = s_races[s_races['weekend_attendance_k'] > 0]
         if not valid_ce.empty:
+            # UPDATED: Color maps explicitly to the text column 'Circuit Type' using a discrete color map
             fig_scatter = px.scatter(
                 valid_ce,
                 x="hosting_fee_usd_m_est",
                 y="weekend_attendance_k",
                 size="weekend_attendance_k",
-                color="is_street_circuit",
+                color="Circuit Type",
                 hover_name="grand_prix",
-                labels={"hosting_fee_usd_m_est": "Hosting Fee ($M USD)", "weekend_attendance_k": "Weekend Attendance (k)"},
-                color_discrete_sequence=['#FF1801', '#00E5FF'],
+                labels={
+                    "hosting_fee_usd_m_est": "Hosting Fee ($M USD)", 
+                    "weekend_attendance_k": "Weekend Attendance (k)"
+                },
+                color_discrete_map={
+                    'Permanent Track': '#FF1801',  # F1 Red
+                    'Street Circuit': '#00E5FF'   # Electric Cyan
+                },
                 title="Economic Yield per Track Asset"
             )
             fig_scatter.update_layout(
                 template="plotly_dark", 
                 paper_bgcolor="rgba(0,0,0,0)",
                 font=dict(color="#FFFFFF"),
-                legend=dict(font=dict(color="#FFFFFF"))
+                legend=dict(
+                    title=dict(text="Circuit Layout", font=dict(color="#FFFFFF")),
+                    font=dict(color="#FFFFFF")
+                )
             )
             st.plotly_chart(fig_scatter, use_container_width=True)
         else:

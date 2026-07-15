@@ -76,8 +76,9 @@ races_df, constructor_df, driver_df, business_df = load_and_clean_data()
 
 
 # 4. DASHBOARD HEADER & F1 HERO IMAGE
+# image_ed8927.jpg referenced as requested for the F1 theme
 st.image(
-    "https://images.unsplash.com/photo-1560072810-1cffb09faf0f?q=80&w=2070&auto=format&fit=crop", 
+    "image_ed8927.jpg", 
     caption="Formula 1 Strategic Data Hub", 
     use_container_width=True
 )
@@ -87,7 +88,7 @@ st.markdown("An elite, high-octane environment linking track performance directl
 st.markdown("---")
 
 
-# 5. TABBED INTERACTIVE ANALYTICS
+# 5. TABBED INTERACTIVE ANALYTICS (Using local selectors for every chart area)
 tab1, tab2, tab3 = st.tabs(["📊 FINANCIALS & TREEMAPS", "🏆 TRACK RACE ANALYTICS", "📈 MACRO ECONOMIC TRENDS"])
 
 # ==================== TAB 1: FINANCIALS & TREEMAPS ====================
@@ -104,8 +105,8 @@ with tab1:
     with col1:
         st.write("**Visualizing Corporate Footprints: Multi-Level Financial Treemap**")
         if not s_constructors.empty:
-            # Enhanced Treemap showing hierarchical relationship: Era -> Country -> Team
-            # Size indicates budget, color maps total revenue generated
+            # Hierarchical Treemap showing: Era -> HQ Country -> Team
+            # Size = Operating Budget; Color = Total Revenue Generated
             fig_tree = px.treemap(
                 s_constructors,
                 path=['in_cost_cap_era', 'country_iso3', 'team_name'],
@@ -164,7 +165,7 @@ with tab2:
             winner_counts = s_races['winner'].value_counts().reset_index()
             winner_counts.columns = ['Driver', 'Wins']
             
-            # Interactive Donut Pie Chart for podium distribution
+            # Donut Pie Chart to spot seasonal dominance instantly
             fig_win_pie = px.pie(
                 winner_counts,
                 names='Driver',
@@ -180,6 +181,7 @@ with tab2:
             
     with col_race2:
         st.write("**Circuit Hosting Fee vs Attendance Density**")
+        # Ensure only circuits with recorded attendance are mapped
         valid_ce = s_races[s_races['weekend_attendance_k'] > 0]
         if not valid_ce.empty:
             fig_scatter = px.scatter(
@@ -203,21 +205,24 @@ with tab3:
     st.markdown("### 📈 Macro-Commercial Evolution Over Time (All Seasons)")
     st.markdown("This historical analysis evaluates how F1's top-tier revenue grew alongside the Netflix era.")
     
-    # FIX: Using go.Bar for the secondary axis tracking instead of go.Scatter with mode='bar'
+    # Combining Lines and Bars with dual-axis mapping
     fig_historical = go.Figure()
     
+    # Trace 1: Corporate Revenue (Line)
     fig_historical.add_trace(go.Scatter(
         x=business_df['season'], y=business_df['total_revenue_usd_m'],
         mode='lines+markers', name='Total F1 Corporate Revenue ($M)',
         line=dict(color='#FF1801', width=3)
     ))
     
+    # Trace 2: Broadcast Revenue (Line)
     fig_historical.add_trace(go.Scatter(
         x=business_df['season'], y=business_df['broadcast_media_usd_m'],
         mode='lines', name='TV Broadcast Media Revenue ($M)',
         line=dict(color='#FFFFFF', dash='dash')
     ))
     
+    # Trace 3: Netflix Drive to Survive (Bar on Secondary Axis)
     fig_historical.add_trace(go.Bar(
         x=business_df['season'], y=business_df['drive_to_survive_viewers_m_est'],
         name='Drive to Survive Viewers (Millions)',
@@ -236,12 +241,3 @@ with tab3:
         barmode='overlay'
     )
     st.plotly_chart(fig_historical, use_container_width=True)
-
-
-# 6. DATA EXPLORER ACCORDION (For local quick views)
-with st.expander("🔍 QUICK RAW WINDOW MANIFEST DATA EXPLORER"):
-    view_option = st.radio("Choose source table to preview:", ["Driver Standings", "Race Manifests"])
-    if view_option == "Driver Standings":
-        st.dataframe(driver_df.head(25), use_container_width=True)
-    else:
-        st.dataframe(races_df.head(25), use_container_width=True)

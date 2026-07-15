@@ -76,9 +76,9 @@ races_df, constructor_df, driver_df, business_df = load_and_clean_data()
 
 
 # 4. DASHBOARD HEADER & F1 HERO IMAGE
-# image_ed8927.jpg referenced as requested for the F1 theme
+# Switched to a reliable web URL of an F1 car on track to avoid local file storage errors
 st.image(
-    "image_ed8927.jpg", 
+    "https://images.unsplash.com/photo-1560072810-1cffb09faf0f?q=80&w=2070&auto=format&fit=crop", 
     caption="Formula 1 Strategic Data Hub", 
     use_container_width=True
 )
@@ -234,7 +234,7 @@ with tab3:
         title="F1 Commercial Revenue Acceleration vs Drive To Survive Viewership Over Time",
         xaxis=dict(title="Season Year"),
         yaxis=dict(title="Revenue ($M USD)", color="#FF1801"),
-        yaxis2=dict(title="Netflix Viewership (M)", color="#A0A5B5", overlaying='y', side='right', showgrid=false),
+        yaxis2=dict(title="Netflix Viewership (M)", color="#A0A5B5", overlaying='y', side='right', showgrid=False),
         template="plotly_dark",
         paper_bgcolor="rgba(0,0,0,0)",
         legend=dict(x=0.01, y=0.99),

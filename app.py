@@ -13,6 +13,15 @@ st.set_page_config(
 # 2. HIGH-CONTRAST F1 DESIGN STYLING (Injected via CSS)
 st.markdown("""
     <style>
+    /* HIDE THE DEFAULT TOP WHITE BAR AND MINIMIZE PADDING GAP */
+    [data-testid="stHeader"] {
+        visibility: hidden;
+        height: 0% !important;
+    }
+    div.block-container {
+        padding-top: 1rem !important;
+    }
+    
     /* Main Background & Fonts */
     .stApp {
         background-color: #0B0C10;
@@ -75,16 +84,16 @@ def load_and_clean_data():
 races_df, constructor_df, driver_df, business_df = load_and_clean_data()
 
 
-# 4. DASHBOARD HEADER & F1 HERO IMAGE
-# Switched to a reliable web URL of an F1 car on track to avoid local file storage errors
+# 4. DASHBOARD HEADER & ACCURATE F1 CAR IMAGE
+# Direct web reference link to clear away any local image caching problems completely
 st.image(
     "https://images.unsplash.com/photo-1560072810-1cffb09faf0f?q=80&w=2070&auto=format&fit=crop", 
-    caption="Formula 1 Strategic Data Hub", 
+    caption="Formula 1 Strategic Data Analytics Suite", 
     use_container_width=True
 )
 
 st.title("🏎️ FORMULA 1 PERFORMANCE & ECONOMICS CENTRALE")
-st.markdown("An elite, high-octane environment linking track performance directly to economic metrics.")
+st.markdown("An elite analytics environment mapping on-track Grand Prix parameters directly to macroeconomic variables.")
 st.markdown("---")
 
 
@@ -95,7 +104,6 @@ tab1, tab2, tab3 = st.tabs(["📊 FINANCIALS & TREEMAPS", "🏆 TRACK RACE ANALY
 with tab1:
     st.markdown("### 💰 Team Financial Breakdown & Revenue Distribution")
     
-    # Season filter strictly local to this financial section
     all_seasons = sorted(constructor_df['season'].unique(), reverse=True)
     fin_season = st.selectbox("📅 Filter Financials by Season:", all_seasons, key="fin_season_select")
     s_constructors = constructor_df[constructor_df['season'] == fin_season]
@@ -105,8 +113,6 @@ with tab1:
     with col1:
         st.write("**Visualizing Corporate Footprints: Multi-Level Financial Treemap**")
         if not s_constructors.empty:
-            # Hierarchical Treemap showing: Era -> HQ Country -> Team
-            # Size = Operating Budget; Color = Total Revenue Generated
             fig_tree = px.treemap(
                 s_constructors,
                 path=['in_cost_cap_era', 'country_iso3', 'team_name'],
@@ -122,7 +128,12 @@ with tab1:
                 },
                 title=f"Hierarchical Allocation of Team Budgets & Revenue Profiles ({fin_season})"
             )
-            fig_tree.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)")
+            # Update layouts and force font/legend labels to absolute white text
+            fig_tree.update_layout(
+                template="plotly_dark", 
+                paper_bgcolor="rgba(0,0,0,0)",
+                font=dict(color="#FFFFFF")
+            )
             st.plotly_chart(fig_tree, use_container_width=True)
         else:
             st.info("No constructor financial data available for this specific season.")
@@ -143,7 +154,13 @@ with tab1:
                 color_discrete_sequence=['#FF1801', '#FFFFFF'],
                 title=f"{selected_team} Core Income Split ($M)"
             )
-            fig_pie.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)")
+            # Ensuring white text on legends and chart descriptors
+            fig_pie.update_layout(
+                template="plotly_dark", 
+                paper_bgcolor="rgba(0,0,0,0)",
+                font=dict(color="#FFFFFF"),
+                legend=dict(font=dict(color="#FFFFFF"))
+            )
             st.plotly_chart(fig_pie, use_container_width=True)
         else:
             st.info("No team breakdown data loaded.")
@@ -152,7 +169,6 @@ with tab1:
 with tab2:
     st.markdown("### 🏁 Grand Prix Dominance & Circuit Hosting Economics")
     
-    # Local season filters for Race analytics
     race_seasons = sorted(races_df['season'].unique(), reverse=True)
     race_season = st.selectbox("📅 Filter Race Data by Season:", race_seasons, key="race_season_select")
     s_races = races_df[races_df['season'] == race_season]
@@ -165,7 +181,6 @@ with tab2:
             winner_counts = s_races['winner'].value_counts().reset_index()
             winner_counts.columns = ['Driver', 'Wins']
             
-            # Donut Pie Chart to spot seasonal dominance instantly
             fig_win_pie = px.pie(
                 winner_counts,
                 names='Driver',
@@ -174,14 +189,19 @@ with tab2:
                 color_discrete_sequence=px.colors.sequential.Reds_r,
                 title=f"Proportion of Wins by Driver ({race_season})"
             )
-            fig_win_pie.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)")
+            # Force legibility across dark panels
+            fig_win_pie.update_layout(
+                template="plotly_dark", 
+                paper_bgcolor="rgba(0,0,0,0)",
+                font=dict(color="#FFFFFF"),
+                legend=dict(font=dict(color="#FFFFFF"))
+            )
             st.plotly_chart(fig_win_pie, use_container_width=True)
         else:
             st.info("No race result records found.")
             
     with col_race2:
         st.write("**Circuit Hosting Fee vs Attendance Density**")
-        # Ensure only circuits with recorded attendance are mapped
         valid_ce = s_races[s_races['weekend_attendance_k'] > 0]
         if not valid_ce.empty:
             fig_scatter = px.scatter(
@@ -195,7 +215,12 @@ with tab2:
                 color_discrete_sequence=['#FF1801', '#00E5FF'],
                 title="Economic Yield per Track Asset"
             )
-            fig_scatter.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)")
+            fig_scatter.update_layout(
+                template="plotly_dark", 
+                paper_bgcolor="rgba(0,0,0,0)",
+                font=dict(color="#FFFFFF"),
+                legend=dict(font=dict(color="#FFFFFF"))
+            )
             st.plotly_chart(fig_scatter, use_container_width=True)
         else:
             st.info("Hosting metrics or attendance fields are zero or missing for this specific season's circuits.")
@@ -205,39 +230,36 @@ with tab3:
     st.markdown("### 📈 Macro-Commercial Evolution Over Time (All Seasons)")
     st.markdown("This historical analysis evaluates how F1's top-tier revenue grew alongside the Netflix era.")
     
-    # Combining Lines and Bars with dual-axis mapping
     fig_historical = go.Figure()
     
-    # Trace 1: Corporate Revenue (Line)
     fig_historical.add_trace(go.Scatter(
         x=business_df['season'], y=business_df['total_revenue_usd_m'],
         mode='lines+markers', name='Total F1 Corporate Revenue ($M)',
         line=dict(color='#FF1801', width=3)
     ))
     
-    # Trace 2: Broadcast Revenue (Line)
     fig_historical.add_trace(go.Scatter(
         x=business_df['season'], y=business_df['broadcast_media_usd_m'],
         mode='lines', name='TV Broadcast Media Revenue ($M)',
         line=dict(color='#FFFFFF', dash='dash')
     ))
     
-    # Trace 3: Netflix Drive to Survive (Bar on Secondary Axis)
     fig_historical.add_trace(go.Bar(
         x=business_df['season'], y=business_df['drive_to_survive_viewers_m_est'],
         name='Drive to Survive Viewers (Millions)',
         yaxis='y2', opacity=0.25, marker_color='#FFFFFF'
     ))
 
-    # Dual-axis layout configurations
+    # Dual-axis layout configurations with absolute white legend text overrides
     fig_historical.update_layout(
         title="F1 Commercial Revenue Acceleration vs Drive To Survive Viewership Over Time",
-        xaxis=dict(title="Season Year"),
-        yaxis=dict(title="Revenue ($M USD)", color="#FF1801"),
-        yaxis2=dict(title="Netflix Viewership (M)", color="#A0A5B5", overlaying='y', side='right', showgrid=False),
+        xaxis=dict(title="Season Year", titlefont=dict(color="#FFFFFF"), tickfont=dict(color="#FFFFFF")),
+        yaxis=dict(title="Revenue ($M USD)", color="#FF1801", titlefont=dict(color="#FFFFFF"), tickfont=dict(color="#FFFFFF")),
+        yaxis2=dict(title="Netflix Viewership (M)", color="#A0A5B5", overlaying='y', side='right', showgrid=False, titlefont=dict(color="#FFFFFF"), tickfont=dict(color="#FFFFFF")),
         template="plotly_dark",
         paper_bgcolor="rgba(0,0,0,0)",
-        legend=dict(x=0.01, y=0.99),
+        font=dict(color="#FFFFFF"),
+        legend=dict(x=0.01, y=0.99, font=dict(color="#FFFFFF")),
         barmode='overlay'
     )
     st.plotly_chart(fig_historical, use_container_width=True)

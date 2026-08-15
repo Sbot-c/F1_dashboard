@@ -1,0 +1,10 @@
+# Save as .streamlit/config.toml next to app.py so Streamlit's own widgets
+# match the dashboard theme instead of rendering light.
+
+[theme]
+base = "dark"
+primaryColor = "#F2B705"
+backgroundColor = "#0B0E14"
+secondaryBackgroundColor = "#121824"
+textColor = "#E8EDF5"
+font = "sans serif"
